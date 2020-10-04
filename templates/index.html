@@ -1,0 +1,21 @@
+<table>
+  <tr>
+
+    <th>Name</th>
+    <th>Last Build</th>
+    <th>Last Result</th>
+    <th>Last Console</th>
+    <th>Last Exception</th>
+  </tr>
+  {% for result in results %}
+      <div style="text-align: center;">
+      <tr>
+        <td><a href="{{ result.url }}">{{ result.name }}</a></td>
+        <td><a href="{{ result.url }}/{{ result.last_build }}">{{ result.last_build }}</a></td>
+        <td>{{ result.last_result }}</td>
+        <td><a href="{{ result.url }}/{{ result.last_build }}/consoleFull">link</a></td>
+        <td>{{ result.last_exception }}</td>
+      </tr>
+      </div>
+  {% endfor %}
+</table>

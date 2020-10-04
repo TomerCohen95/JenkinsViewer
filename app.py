@@ -1,9 +1,12 @@
 import typing
-from flask import Flask
+
+import flask
+import requests
+from flask import Flask, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
 
-from automation_core.named_json import NamedJson
+from jenkins_handler import jenkins_handler
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
@@ -13,85 +16,53 @@ db = SQLAlchemy(app)
 from models import Result
 
 
-@app.route('/')
-def hello():
-    return "Hello World!"
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    errors = []
+    if request.method == "POST":
+        # get url that the user has entered
+        try:
+            url = request.form['url']
+            r = requests.get(url)
+            print(r.text)
+        except:
+            errors.append(
+                "Unable to get URL. Please make sure it's valid and try again."
+            )
+    results = Result.query.all()
+    return render_template('index.html', errors=errors, results=results)
 
 
-@app.route('/<name>')
-def hello_name(name):
-    return "Hello {}!".format(name)
+@app.route('/update')
+def update_nightly_results():
+    Result.query.delete()
+    db.session.commit()
+    jenkins = jenkins_handler.get_jenkins_handler()
+    builds = jenkins.get_all_builds()
+    for build in builds.jobs:
+        result = Result(
+            name=build.name,
+            last_build=build.last_build,
+            last_exception=build.last_exception,
+            last_result=build.last_result,
+            traceback=build.traceback,
+            url=build.url
+        )
+        db.session.add(result)
+    db.session.commit()
+    return 'OK'
+
+
+@app.route('/getNightly')
+def get_nightly_results():
+    return flask.jsonify(Result.query.all())
+
+
+@app.route('/getNightly/<job>')
+def get_job_results(job):
+    job = Result.query.filter_by(name=job).first()
+    return flask.jsonify(job)
 
 
 if __name__ == '__main__':
     app.run()
-
-#
-# from models import Result
-# import requests
-# from flask import abort
-#
-# from automation_core.named_json import NamedJson
-# from jenkins_handler import jenkins_handler
-# from jenkins_handler.jenkins_handler import JenkinsHandler
-# import typing
-# from http import HTTPStatus
-#
-
-    # @staticmethod
-    # def get_jenkins_job_object(name=None, last_build=None, last_result=None, last_console=None):
-    #     response = JenkinsJob(json_obj={})
-    #     response.name = name
-    #     response.last_build = last_build
-    #     response.last_result = last_result
-    #     response.last_console = last_console
-    #     return response
-
-
-
-# jenkins = jenkins_handler.get_jenkins_handler()
-# jenkins.get_all_build_numbers('/QA/Nightly/Windows10x64 Managed 2.4')
-# builds_ints = jenkins.get_all_build_numbers('Management/Management-CI')
-# builds_ints = jenkins.server.get_jobs(view_name='QA')
-
-# builds = [str(build) for build in builds_ints]
-# return str(','.join(builds))
-#
-#
-# @app.route('/')
-# def hello_world():
-#     return 'Hello World!'
-#
-#
-# @app.route('/getallbuilds')
-# def get_all_builds():
-#     try:
-#         jenkins = jenkins_handler.get_jenkins_handler()
-#
-#         # jenkins.get_all_build_numbers('/QA/Nightly/Windows10x64 Managed 2.4')
-#         # builds_ints = jenkins.get_all_build_numbers('Management/Management-CI')
-#         # jenkins.server.get_job_info(f'QA/Nightly/{name}')
-#
-#         all_jenkins_jobs = get_job_objects(jenkins, folder_path='QA/Nightly')
-#
-#         jobs = [
-#             JenkinsJob(json_obj={}, name=j['name'], last_build=j['lastBuild']['number'], last_result=j['color'],
-#                        last_console=jenkins.server.get_build_console_output(name=j['fullName'],
-#                                                                             number=j['lastBuild'][
-#                                                                                 'number'])) for j in
-#             all_jenkins_jobs]
-#
-#         ret_val = JenkinsJobList.get_jenkins_jobs_object(jobs=jobs)
-#         return flask.jsonify(ret_val.dumps())
-#
-#     except requests.exceptions.ConnectionError as e:
-#         if 'HTTPSConnectionPool' in str(e):
-#             abort(HTTPStatus.FORBIDDEN)
-#     # alljobs = [JenkinsJob(name=job['name'], last_result=job['color']) for job in jobs]
-#
-#     # return '</br>'.join()
-#
-#
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
