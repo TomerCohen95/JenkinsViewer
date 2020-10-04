@@ -12,9 +12,9 @@ import re
 import requests
 
 os.environ["PYTHONHTTPSVERIFY"] = "0"
-JENKINS_URL = 'https://chief'
-JENKINS_USERNAME = 'automation'
-JENKINS_PASSWORD = 'tuyunmhv2018!'
+JENKINS_URL = ''
+JENKINS_USERNAME = ''
+JENKINS_PASSWORD = ''
 
 
 @dataclass
@@ -24,8 +24,24 @@ class JenkinsJob:
     last_build: int
     last_result: str
     url: str
+    did_run_tests: bool = None
     traceback: str = None
     last_exception: str = None
+
+    def get_exception_traceback(self, console_output):  # TODO: extract to a class and prettify
+        TEST_RUN_INDICATION: str = 'short test summary info'
+        self.did_run_tests = TEST_RUN_INDICATION in console_output
+        if self.did_run_tests:
+            start = console_output.find(TEST_RUN_INDICATION)
+            end = console_output.find('Pipeline', start) - 1
+            return console_output[start:end]
+        start = find_all('Traceback', console_output)[-1]
+        end = console_output.find('Pipeline', start) - 1
+        return console_output[start:end]
+
+    def get_end_of_traceback(self):
+        if self.traceback is not None:
+            return '\n'.join(self.traceback.splitlines()[-3:])  # get last three lines of traceback
 
 
 @dataclass
@@ -83,30 +99,15 @@ class JenkinsHandler:
 
             for job in jobs:
                 if job.last_result == 'red':
-                    job.traceback = self.get_exception_traceback(job)
-                    job.last_exception = self.get_last_three_lines_of_traceback(job.traceback)
+                    job.traceback = job.get_exception_traceback(console_output=self.get_last_console_output(job))
+                    job.last_exception = job.traceback if job.did_run_tests else job.get_end_of_traceback()
             return JenkinsJobList(jobs=jobs)
 
         except requests.exceptions.ConnectionError as e:
             if 'HTTPSConnectionPool' in str(e):
                 raise ConnectionError('Could not reach jenkions server - make sure you are connected with VPN')
-                # abort(HTTPStatus.FORBIDDEN)
 
-    def get_last_three_lines_of_traceback(self, traceback):
-        if traceback is not None:
-            return '\n'.join(traceback.splitlines()[-3:])  # get last three lines of traceback
-
-    def get_exception_traceback(self, job):  # TODO: extract to a class and prettify
-        last_console = self.get_last_console_output(job)
-        if 'short test summary info' in last_console:  # TODO: const
-            start = last_console.find('short test summary info')
-            end = last_console.find('Pipeline', start) - 1
-            return last_console[start:end]
-        start = find_all('Traceback', last_console)[-1]
-        end = last_console.find('Pipeline', start) - 1
-        return last_console[start:end]
-
-    def get_last_console_output(self, job: JenkinsJob):
+    def get_last_console_output(self, job):
         return self.server.get_build_console_output(name=f'{job.folder}/{job.name}',
                                                     number=job.last_build)
 

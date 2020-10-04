@@ -30,6 +30,10 @@ def index():
                 "Unable to get URL. Please make sure it's valid and try again."
             )
     results = Result.query.all()
+    for res in results:
+        if res.last_exception is not None:
+            pass
+            # res.last_exception = res.last_exception.replace('\n', '</br>')
     return render_template('index.html', errors=errors, results=results)
 
 
@@ -62,6 +66,14 @@ def get_nightly_results():
 def get_job_results(job):
     job = Result.query.filter_by(name=job).first()
     return flask.jsonify(job)
+
+
+@app.route('/<job_name>/traceback')
+def get_job_traceback(job_name):
+    job = Result.query.filter_by(name=job_name).first()
+    if job.traceback:
+        return job.traceback.replace('\n', '<br>')
+    else: return '<h1>No traceback to show<h1>'
 
 
 if __name__ == '__main__':

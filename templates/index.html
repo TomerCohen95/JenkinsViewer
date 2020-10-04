@@ -1,21 +1,37 @@
-<table>
-  <tr>
+<style>
+    body {
+        background-color: linen;
+    }
 
-    <th>Name</th>
-    <th>Last Build</th>
-    <th>Last Result</th>
-    <th>Last Console</th>
-    <th>Last Exception</th>
-  </tr>
-  {% for result in results %}
-      <div style="text-align: center;">
-      <tr>
-        <td><a href="{{ result.url }}">{{ result.name }}</a></td>
-        <td><a href="{{ result.url }}/{{ result.last_build }}">{{ result.last_build }}</a></td>
-        <td>{{ result.last_result }}</td>
-        <td><a href="{{ result.url }}/{{ result.last_build }}/consoleFull">link</a></td>
-        <td>{{ result.last_exception }}</td>
-      </tr>
-      </div>
-  {% endfor %}
+    table, th, td {
+        border: 1px solid black;
+    }
+
+    td {
+        text-align: center;
+    }
+
+</style>
+<table>
+    <tr>
+
+        <th>Name</th>
+        <th>Last Build</th>
+        <th>Last Result</th>
+        <th>Last Console</th>
+        <th>Last Exception</th>
+    </tr>
+    {% for result in results %}
+            <tr>
+                <td><a href="{{ result.url }}">{{ result.name }}</a></td>
+                <td><a href="{{ result.url }}/{{ result.last_build }}">{{ result.last_build }}</a></td>
+                <td>{{ result.last_result }}</td>
+                <td><a href="{{ result.url }}/{{ result.last_build }}/consoleFull">link</a></td>
+                <td style="text-align: left;">
+                    <pre><a style="color: black;background-color: transparent;text-decoration: none;"
+                            href="/{{ result.name }}/traceback">{{ result.last_exception }}</a></pre>
+                </td>
+            </tr>
+        </div>
+    {% endfor %}
 </table>
