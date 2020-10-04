@@ -11,12 +11,11 @@ import re
 # from utils import condition_polling
 import requests
 
-from automation_core.named_json import NamedJson
-
 os.environ["PYTHONHTTPSVERIFY"] = "0"
-JENKINS_URL = ''
-JENKINS_USERNAME = ''
-JENKINS_PASSWORD = '!'
+JENKINS_URL = 'https://chief'
+JENKINS_USERNAME = 'automation'
+JENKINS_PASSWORD = 'tuyunmhv2018!'
+
 
 @dataclass
 class JenkinsJob:
