@@ -18,8 +18,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=hello-flask
-      - POSTGRES_PASSWORD=hello-flask
+      - POSTGRES_USER=jenkins
+      - POSTGRES_PASSWORD=jenkins
       - POSTGRES_DB=jenkins-viewer
 volumes:
   postgres_data:
