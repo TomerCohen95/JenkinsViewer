@@ -12,10 +12,5 @@ manager = Manager(app)
 
 manager.add_command('db', MigrateCommand)
 
-
-# def upgrade():
-#     op.alter_column('results', 'last_result', existing_type=sa.Integer(), type_=sa.String())
-
-
 if __name__ == '__main__':
     manager.run()

@@ -73,7 +73,13 @@ def get_job_traceback(job_name):
     job = Result.query.filter_by(name=job_name).first()
     if job.traceback:
         return job.traceback.replace('\n', '<br>')
-    else: return '<h1>No traceback to show<h1>'
+    else:
+        return '<h1>No traceback to show<h1>'
+
+
+@app.route('/test')
+def test():
+    return 'server is up'
 
 
 if __name__ == '__main__':
