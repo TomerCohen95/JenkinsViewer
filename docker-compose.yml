@@ -3,7 +3,7 @@ version: '3.7'
 services:
   web:
     build: .
-    command: python manage.py runserver --host 0.0.0.0
+    command: python manage.py run -h 0.0.0.0
     volumes:
       - .:/app/
     ports:
@@ -11,14 +11,15 @@ services:
     environment:
       - APP_SETTINGS=config.ProductionConfig
       - DATABASE_URL=postgresql://jenkins:jenkins@db:5432/jenkins-viewer
+    depends_on:
+      - db
   db:
     image: postgres:12-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=jenkins
-      - POSTGRES_PASSWORD=jenkins
+      - POSTGRES_USER=hello-flask
+      - POSTGRES_PASSWORD=hello-flask
       - POSTGRES_DB=jenkins-viewer
-
 volumes:
   postgres_data:
