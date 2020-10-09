@@ -98,6 +98,7 @@ class JenkinsHandler:
                 all_jenkins_jobs]
 
             for job in jobs:
+                self._get_ips_and_names(job)
                 if job.last_result == 'red':
                     job.traceback = job.get_exception_traceback(console_output=self.get_last_console_output(job))
                     job.last_exception = job.traceback if job.did_run_tests else job.get_end_of_traceback()
@@ -121,6 +122,11 @@ class JenkinsHandler:
         jobs_paths = [f'{folder_path}/{name}' for name in jobs_names]
         return jobs_paths
 
+    def _get_ips_and_names(self, job):
+        lines = self.get_last_console_output(job).split('\n')
+        for line in lines:
+            if 'Created appliance machine with IP:' in line:
+                print(line)
 
 def get_jenkins_handler() -> 'JenkinsHandler':
     # logger.debug('getting jenkins handler object')
