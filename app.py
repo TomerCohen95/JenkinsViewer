@@ -42,7 +42,7 @@ def update_nightly_results():
     Result.query.delete()
     db.session.commit()
     jenkins = jenkins_handler.get_jenkins_handler()
-    builds = jenkins.get_all_builds()
+    builds = jenkins.get_all_builds_results()
     for build in builds.jobs:
         result = Result(
             name=build.name,
