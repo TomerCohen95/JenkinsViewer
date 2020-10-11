@@ -9,6 +9,10 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = 'this-really-needs-to-be-changed'
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    JENKINS_URL = ''
+    JENKINS_USERNAME = ''
+    JENKINS_PASSWORD = ''
+    JOBS_FOLDER = ''
 
 
 class ProductionConfig(Config):
