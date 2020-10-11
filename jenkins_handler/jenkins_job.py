@@ -11,14 +11,17 @@ class JobLogParser(ABC):
     TEST_RUN_INDICATION: str = 'short test summary info'
     EARLY_FAILURE_INDICATION: str = 'Traceback'
     END_OF_PIPELINE_INDICATION = 'Pipeline'
+    _exception_traceback: str = None
+    _exception_to_show: str = None
 
     @property
     @abstractmethod
     def exception_traceback(self):
         pass
 
+    @property
     @abstractmethod
-    def get_exception_to_show(self):
+    def exception_to_show(self):
         pass
 
     def _get_end_of_traceback(self):
@@ -29,25 +32,31 @@ class JobLogParser(ABC):
 class TestsJobLogParser(JobLogParser):
     @property
     def exception_traceback(self):
-        if self.exception_traceback is None:
+        if self._exception_traceback is None:
             start = self.console_output.find(JobLogParser.TEST_RUN_INDICATION)
             end = self.console_output.find(JobLogParser.END_OF_PIPELINE_INDICATION, start) - 1
-            return self.console_output[start:end]
+            self._exception_traceback = self.console_output[start:end]
+        return self._exception_traceback
 
-    def get_exception_to_show(self):
+    @property
+    def exception_to_show(self):
         return self.exception_traceback
 
 
 class EarlyFailedJobLogParser(JobLogParser):
     @property
     def exception_traceback(self):
-        if self.exception_traceback is None:
+        if self._exception_traceback is None:
             start = find_all(substring=JobLogParser.EARLY_FAILURE_INDICATION, full_string=self.console_output)[-1]
-            end = self.console_output.find(sub=JobLogParser.END_OF_PIPELINE_INDICATION, __start=start) - 1
-            return self.console_output[start:end]
+            end = self.console_output.find(JobLogParser.END_OF_PIPELINE_INDICATION, start) - 1
+            self._exception_traceback = self.console_output[start:end]
+        return self._exception_traceback
 
-    def get_exception_to_show(self):
-        return self._get_end_of_traceback()
+    @property
+    def exception_to_show(self):
+        if self._exception_to_show is None:
+            self._exception_to_show = self._get_end_of_traceback()
+        return self._exception_to_show
 
 
 class JobLogParserFactory:
