@@ -1,8 +1,6 @@
 import typing
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from automation_core.logging.string_utils import find_all
 from jenkins_handler.jenkins_logs_parser import JobLogParser
 
 

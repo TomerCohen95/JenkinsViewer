@@ -23,12 +23,11 @@ class JobLogParser(ABC):
     def exception_to_show(self):
         pass
 
-    def _get_end_of_traceback(self):
-        if self.exception_traceback is not None:
-            return '\n'.join(self.exception_traceback.splitlines()[-3:])  # gets last three lines of traceback
-
 
 class TestsJobLogParser(JobLogParser):
+    """
+    A parser for a run in which tests were run
+    """
     @property
     def exception_traceback(self):
         if self._exception_traceback is None:
@@ -43,6 +42,13 @@ class TestsJobLogParser(JobLogParser):
 
 
 class EarlyFailedJobLogParser(JobLogParser):
+    """
+    A parser for a run in which tests weren't run and an early failure occurred
+    """
+    def _get_end_of_traceback(self):
+        if self.exception_traceback is not None:
+            return '\n'.join(self.exception_traceback.splitlines()[-3:])  # gets last three lines of traceback
+
     @property
     def exception_traceback(self):
         if self._exception_traceback is None:

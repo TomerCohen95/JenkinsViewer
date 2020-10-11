@@ -1,17 +1,13 @@
 import typing
-from dataclasses import dataclass
 
 import jenkins
 import os
 
-# from framework.agent.vmwareapi.vcenter_data import VCenterData
-
-# from infra.exceptions.illegal_state_exception import IllegalStateException
-# from utils import condition_polling
 import requests
 from automation_core.logging import log_wrapper
 from config import Config
-from jenkins_handler.jenkins_job import JenkinsJobList, JenkinsJob, JobLogParserFactory
+from jenkins_handler.jenkins_job import JenkinsJobList, JenkinsJob
+from jenkins_handler.jenkins_logs_parser import JobLogParserFactory
 
 os.environ["PYTHONHTTPSVERIFY"] = "0"
 
