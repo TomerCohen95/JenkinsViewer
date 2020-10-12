@@ -1,10 +1,8 @@
 import typing
-
 import jenkins
 import os
-
 import requests
-from automation_core.logging import log_wrapper
+from common.logging import log_wrapper
 from jenkins_handler.jenkins_config import JenkinsConfig
 from jenkins_handler.jenkins_job import JenkinsJobList, JenkinsJob
 from jenkins_handler.jenkins_logs_parser import JobLogParserFactory
