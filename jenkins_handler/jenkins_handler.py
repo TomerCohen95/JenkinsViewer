@@ -6,6 +6,7 @@ import os
 import requests
 from automation_core.logging import log_wrapper
 from config import Config
+from jenkins_handler.jenkins_config import JenkinsConfig
 from jenkins_handler.jenkins_job import JenkinsJobList, JenkinsJob
 from jenkins_handler.jenkins_logs_parser import JobLogParserFactory
 
@@ -20,7 +21,7 @@ class JenkinsHandler:
 
     def get_all_builds_results(self) -> JenkinsJobList:
         try:
-            all_jenkins_jobs = self._get_job_objects(folder_path=Config.JOBS_FOLDER)
+            all_jenkins_jobs = self._get_job_objects(folder_path=JenkinsConfig.JOBS_FOLDER)
             jobs_results = self._convert_jenkins_objects_to_results(all_jenkins_jobs)
             return JenkinsJobList(jobs=jobs_results)
 
@@ -63,8 +64,8 @@ class JenkinsHandler:
 def get_jenkins_handler() -> 'JenkinsHandler':
     logger.debug('getting jenkins handler object')
     try:
-        server = jenkins.Jenkins(url=Config.JENKINS_URL, username=Config.JENKINS_USERNAME,
-                                 password=Config.JENKINS_PASSWORD)
+        server = jenkins.Jenkins(url=JenkinsConfig.JENKINS_URL, username=JenkinsConfig.JENKINS_USERNAME,
+                                 password=JenkinsConfig.JENKINS_PASSWORD)
     except ConnectionError:
         logger.exception('Could not connect to jenkins server')
         return None
