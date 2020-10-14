@@ -14,4 +14,5 @@ docker-compose exec web python manage.py db upgrade
 ```
 
 Now surf to your URL in port 5000 - i.e. 127.0.0.1:5000
+
 For updating the DB with data go to 127.0.0.1:5000/update
