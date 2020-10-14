@@ -8,6 +8,8 @@ services:
       - .:/app/
     ports:
       - 5000:5000
+    env_file:
+      - ./.env
     environment:
       - APP_SETTINGS=config.ProductionConfig
       - DATABASE_URL=postgresql://jenkins:jenkins@db:5432/jenkins-viewer
