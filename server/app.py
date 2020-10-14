@@ -1,5 +1,3 @@
-import typing
-
 import flask
 import requests
 from flask import Flask, request, render_template
@@ -8,14 +6,14 @@ import os
 
 from jenkins_wrapper import jenkins_handler
 
-from config import Config
+from configs.config import Config
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder=f'{os.path.dirname(os.path.dirname(__file__))}/templates')
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-from models import Result
+from server.models import Result
 
 
 @app.route('/', methods=['GET', 'POST'])

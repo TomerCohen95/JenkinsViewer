@@ -9,9 +9,9 @@ services:
     ports:
       - 5000:5000
     env_file:
-      - ./.env
+      - configs/.env
     environment:
-      - APP_SETTINGS=config.ProductionConfig
+      - APP_SETTINGS=configs.config.ProductionConfig
       - DATABASE_URL=postgresql://jenkins:jenkins@db:5432/jenkins-viewer
   db:
     image: postgres:12-alpine
