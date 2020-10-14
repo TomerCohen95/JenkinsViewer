@@ -6,7 +6,9 @@ from flask import Flask, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 import os
 
-from jenkins_handler import jenkins_handler
+from jenkins_wrapper import jenkins_handler
+
+from config import Config
 
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
@@ -41,8 +43,9 @@ def index():
 def update_nightly_results():
     Result.query.delete()
     db.session.commit()
-    jenkins = jenkins_handler.get_jenkins_handler()
-    builds = jenkins.get_all_builds_results()
+    jenkins = jenkins_handler.get_jenkins_handler(url=Config.JENKINS_URL, username=Config.JENKINS_USERNAME,
+                                                  password=Config.JENKINS_PASSWORD)
+    builds = jenkins.get_all_builds_results(jobs_folder_path=Config.JOBS_FOLDER)
     for build in builds.jobs:
         result = Result(
             name=build.name,
