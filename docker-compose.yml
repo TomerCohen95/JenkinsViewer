@@ -3,7 +3,11 @@ version: '3.7'
 services:
   web:
     build: .
-    command: python manage.py runserver --host 0.0.0.0
+    command: bash -c "
+      python manage.py db init
+      && python manage.py db migrate
+      && python manage.py db upgrade
+      && python manage.py runserver --host 0.0.0.0"
     volumes:
       - .:/app/
     ports:
